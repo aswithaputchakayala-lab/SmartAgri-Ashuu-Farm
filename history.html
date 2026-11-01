@@ -1,0 +1,484 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartAgri | Analysis History</title>
+
+    <style>
+        :root {
+            --green: #1f633f;
+            --dark: #123e2b;
+            --light: #e9f5ec;
+            --page: #f5f8f5;
+            --text: #20362a;
+            --muted: #718078;
+            --border: #e5ece6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--page);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .layout { display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 245px;
+            flex-shrink: 0;
+            background: var(--dark);
+            color: white;
+            padding: 30px 18px;
+        }
+
+        .brand {
+            font-size: 23px;
+            font-weight: 800;
+            padding: 0 12px;
+        }
+
+        .brand small {
+            display: block;
+            color: #b9d9c4;
+            font-size: 11px;
+            margin-top: 6px;
+            letter-spacing: 1.5px;
+        }
+
+        .nav-label {
+            margin: 42px 12px 12px;
+            color: #a9c7b4;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 13px 14px;
+            margin: 6px 0;
+            border-radius: 10px;
+            color: #e2efe6;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: #2b7450;
+            color: white;
+        }
+
+        .sidebar-note {
+            margin: 55px 8px 0;
+            padding: 16px;
+            border: 1px solid #47745b;
+            border-radius: 12px;
+            color: #d6e8dc;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 32px;
+        }
+
+        .eyebrow {
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+        }
+
+        h1 {
+            font-size: clamp(27px, 3vw, 35px);
+            margin: 8px 0;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .top-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 16px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .button-primary {
+            background: var(--green);
+            color: white;
+        }
+
+        .button-secondary {
+            background: white;
+            color: var(--green);
+            border: 1px solid var(--border);
+        }
+
+        .summary-card, .table-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 23px;
+            box-shadow: 0 5px 18px rgba(25, 60, 38, 0.035);
+            margin-bottom: 22px;
+        }
+
+        .summary-label {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .summary-number {
+            color: var(--dark);
+            font-size: 30px;
+            font-weight: 800;
+            margin-top: 8px;
+        }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: minmax(200px, 1fr) 210px;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .toolbar input, .toolbar select {
+            width: 100%;
+            min-width: 0;
+            padding: 12px 14px;
+            border: 1px solid #dce6dd;
+            border-radius: 9px;
+            background: #fff;
+            color: var(--text);
+            font: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .toolbar input:focus, .toolbar select:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(31, 99, 63, 0.09);
+        }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            min-width: 1050px;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f5f8f5;
+            color: #66786b;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        th, td {
+            text-align: left;
+            vertical-align: top;
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            font-size: 12px;
+            line-height: 1.65;
+        }
+
+        tbody tr:hover { background: #fafcf9; }
+
+        .id-label {
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .crop-name {
+            font-weight: 700;
+            color: var(--dark);
+            text-transform: capitalize;
+        }
+
+        .risk-label {
+            display: inline-block;
+            max-width: 220px;
+            padding: 6px 9px;
+            border-radius: 7px;
+            background: var(--light);
+            color: var(--green);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .recommendation {
+            min-width: 210px;
+            max-width: 310px;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-top: 18px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .empty-state {
+            padding: 35px 10px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .footer {
+            padding: 10px 0 5px;
+            color: var(--muted);
+            font-size: 11px;
+            text-align: center;
+        }
+
+        @media (max-width: 850px) {
+            .layout { display: block; }
+            .sidebar { width: 100%; padding: 18px; }
+            .nav-label, .sidebar-note { display: none; }
+            .sidebar nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                margin-top: 15px;
+            }
+            .nav-link { margin: 0; padding: 10px; font-size: 12px; }
+            .main { padding: 20px 14px; }
+            .toolbar { grid-template-columns: 1fr; }
+            .summary-card, .table-card { padding: 16px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="brand">
+            🌿 SmartAgri
+            <small>ASHUU FARM</small>
+        </div>
+
+        <p class="nav-label">WORKSPACE</p>
+
+        <nav>
+            <a class="nav-link"
+               href="{{ url_for('dashboard') }}">▦ & nbsp; Dashboard</a>
+            <a class="nav-link"
+               href="{{ url_for('home') }}">⌂ & nbsp; Crop Analysis</a>
+            <a class="nav-link active"
+               href="{{ url_for('history') }}">▤ & nbsp; Analysis History</a>
+        </nav>
+
+        <div class="sidebar-note">
+            <strong>Analysis records</strong><br>
+            Search past observations and compare recorded crop conditions
+            and recommendations.
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <div>
+                <div class="eyebrow">FARM MANAGEMENT / RECORDS</div>
+                <h1>Crop Analysis History</h1>
+                <p class="subtitle">
+                    Explore all crop analysis records saved in your database.
+                </p>
+            </div>
+
+            <div class="top-actions">
+                <a class="button button-secondary"
+                   href="{{ url_for('dashboard') }}">← Dashboard</a>
+                <a class="button button-primary"
+                   href="{{ url_for('home') }}">+ New Analysis</a>
+            </div>
+        </header>
+
+        <section class="summary-card">
+            <div class="summary-label">Total saved records</div>
+            <div class="summary-number" id="totalRecords">
+                {{ analyses|length }}
+            </div>
+        </section>
+
+        <section class="table-card">
+            <h2 style="margin: 0; font-size: 18px;">All Analysis Records</h2>
+            <p class="subtitle" style="margin-top: 7px;">
+                Use search and crop filters to find a record.
+            </p>
+
+            {% if analyses %}
+            <div class="toolbar">
+                <input
+                    type="search"
+                    id="historySearch"
+                    placeholder="Search crop, symptom, risk or recommendation..."
+                    aria-label="Search analysis records">
+
+                <select id="cropFilter" aria-label="Filter by crop">
+                    <option value="">All crops</option>
+                    {% for crop in analyses|map(attribute='crop')|unique|sort %}
+                    <option value="{{ crop }}">
+                        {{ crop|replace('_', ' ')|title }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="table-wrap">
+                <table id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Crop</th>
+                            <th>Growth Stage</th>
+                            <th>Soil Moisture</th>
+                            <th>Weather</th>
+                            <th>Symptoms</th>
+                            <th>Analysis Result</th>
+                            <th>Recommendation</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in analyses %}
+                        <tr data-crop="{{ item.crop|lower }}">
+                            <td class="id-label">#{{ item.id }}</td>
+                            <td class="crop-name">
+                                {{ item.crop|replace('_', ' ')|title }}
+                            </td>
+                            <td>
+                                {{ item.growth_stage|replace('_', ' ')|title }}
+                            </td>
+                            <td>
+                                {{ item.soil_moisture|replace('_', ' ')|title }}
+                            </td>
+                            <td>
+                                {{ item.weather|replace('_', ' ')|title }}
+                            </td>
+                            <td>
+                                {{ item.symptoms|replace('_', ' ')|title }}
+                            </td>
+                            <td>
+                                <span class="risk-label">{{ item.risk }}</span>
+                            </td>
+                            <td class="recommendation">
+                                {{ item.recommendation }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-footer">
+                <span id="visibleCount">
+                    Showing {{ analyses|length }} records
+                </span>
+                <span>Records are retrieved from MySQL</span>
+            </div>
+
+            <div class="empty-state" id="noMatches" hidden>
+                No matching records found. Try a different search.
+            </div>
+
+            {% else %}
+            <div class="empty-state">
+                <p style="font-size: 30px;">🌱</p>
+                <strong>No analyses saved yet</strong>
+                <p>Start by analysing a crop on the Home page.</p>
+                <a class="button button-primary"
+                   href="{{ url_for('home') }}">Analyse a Crop</a>
+            </div>
+            {% endif %}
+        </section>
+
+        <footer class="footer">
+            SmartAgri · Ashuu Farm · Analysis history
+        </footer>
+
+    </main>
+</div>
+
+<script>
+    const searchInput = document.getElementById("historySearch");
+    const cropFilter = document.getElementById("cropFilter");
+    const table = document.getElementById("historyTable");
+
+    if (searchInput && cropFilter && table) {
+        const rows = Array.from(table.querySelectorAll("tbody tr"));
+        const visibleCount = document.getElementById("visibleCount");
+        const noMatches = document.getElementById("noMatches");
+
+        function filterHistory() {
+            const query = searchInput.value.trim().toLowerCase();
+            const selectedCrop = cropFilter.value.toLowerCase();
+            let visible = 0;
+
+            rows.forEach(row => {
+                const matchesText = row.textContent.toLowerCase().includes(query);
+                const matchesCrop = !selectedCrop ||
+                    row.dataset.crop === selectedCrop;
+                const show = matchesText && matchesCrop;
+
+                row.hidden = !show;
+                if (show) visible++;
+            });
+
+            visibleCount.textContent =
+                `Showing ${visible} of ${rows.length} records`;
+
+            noMatches.hidden = visible !== 0;
+            table.hidden = visible === 0;
+        }
+
+        searchInput.addEventListener("input", filterHistory);
+        cropFilter.addEventListener("change", filterHistory);
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer Profile | SmartAgri</title>
+  <style>
+    :root{--green:#176b45;--green2:#eaf5ee;--ink:#1d2b24;--muted:#66756c;--line:#dce7df;--bg:#f5f8f5;--white:#fff;--danger:#b42318}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .topbar{background:#fff;border-bottom:1px solid var(--line);padding:17px max(5%,calc((100% - 1100px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+    .brand{font-weight:800;color:var(--green);font-size:21px}.nav a{color:var(--muted);text-decoration:none;margin-left:18px;font-size:14px}
+    main{max-width:1000px;margin:38px auto;padding:0 20px 50px}.eyebrow{color:var(--green);font-weight:700;font-size:12px;letter-spacing:1.5px;text-transform:uppercase}
+    h1{font-size:clamp(27px,4vw,38px);margin:8px 0}.intro{color:var(--muted);margin:0 0 26px;line-height:1.6}
+    .card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:25px;margin:18px 0;box-shadow:0 5px 20px #183c2510}
+    h2{font-size:19px;margin:0 0 20px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}
+    label{font-size:13px;font-weight:650;color:#435249}input,select{width:100%;padding:12px 13px;border:1px solid #cfdcd2;border-radius:9px;background:#fff;color:var(--ink);font:inherit;min-height:44px}input:focus,select:focus{outline:2px solid #b5dbc2;border-color:var(--green)}
+    .crop{border:1px solid var(--line);border-radius:12px;padding:17px;margin:13px 0;background:#fcfefc}.crop-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.crop-head strong{color:var(--green)}
+    .btn{border:0;border-radius:9px;padding:12px 17px;font-weight:700;cursor:pointer;font:inherit}.primary{background:var(--green);color:white}.secondary{background:var(--green2);color:var(--green)}.remove{background:#fff0ef;color:var(--danger);padding:8px 11px;font-size:13px}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.summary{font-size:14px;color:var(--muted);margin-top:13px}.summary b{color:var(--green)}
+    #message{display:none;padding:13px 15px;border-radius:9px;margin:16px 0;font-size:14px}#message.success{display:block;background:#eaf5ee;color:#145c38}#message.error{display:block;background:#fff0ef;color:#9b1c14}
+    .hint{font-size:12px;color:var(--muted);line-height:1.5}.required{color:var(--danger)}
+    @media(max-width:650px){.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.card{padding:18px}.nav a{margin-left:10px}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">🌱 SmartAgri</div>
+    <nav class="nav"><a href="/">Home</a><a href="/dashboard">Dashboard</a><a href="/history">History</a></nav>
+  </header>
+  <main>
+    <div class="eyebrow">Farm management</div>
+    <h1>Farmer Profile</h1>
+    <p class="intro">Add farmer information and record every crop grown on the farm. Crop acreage total must not exceed the total land area.</p>
+    <div id="message" role="status" aria-live="polite"></div>
+    <form id="farmer-form">
+      <section class="card">
+        <h2>Personal and farm details</h2>
+        <div class="grid">
+          <div class="field"><label for="farmer_name">Farmer name <span class="required">*</span></label><input id="farmer_name" required maxlength="100" placeholder="Enter farmer name"></div>
+          <div class="field"><label for="phone">Phone number (optional)</label><input id="phone" maxlength="20" inputmode="tel" placeholder="Enter phone number"></div>
+          <div class="field"><label for="village">Village</label><input id="village" maxlength="100" placeholder="Village name"></div>
+          <div class="field"><label for="district">District</label><input id="district" maxlength="100" placeholder="District name"></div>
+          <div class="field"><label for="state">State</label><input id="state" maxlength="100" value="Andhra Pradesh"></div>
+          <div class="field"><label for="total_acres">Total farmland (acres) <span class="required">*</span></label><input id="total_acres" type="number" min="0.01" max="1000000" step="0.01" required placeholder="e.g. 5"></div>
+        </div>
+      </section>
+      <section class="card">
+        <h2>Crop details</h2>
+        <div id="crop-list"></div>
+        <div class="actions"><button type="button" class="btn secondary" id="add-crop">＋ Add another crop</button></div>
+        <p class="summary">Total crop area: <b id="crop-total">0.00 acres</b></p>
+        <p class="hint">You can add multiple crops. The combined crop area cannot be greater than total farmland.</p>
+      </section>
+      <div class="actions"><button class="btn primary" type="submit" id="save-btn">Save Farmer Profile</button><button class="btn secondary" type="reset">Clear form</button></div>
+    </form>
+  </main>
+  <template id="crop-template">
+    <div class="crop">
+      <div class="crop-head"><strong class="crop-number">Crop</strong><button type="button" class="btn remove remove-crop">Remove</button></div>
+      <div class="grid">
+        <div class="field"><label>Crop name <span class="required">*</span></label><input class="crop-name" maxlength="100" required placeholder="e.g. Rice"></div>
+        <div class="field"><label>Area (acres) <span class="required">*</span></label><input class="crop-acres" type="number" min="0.01" step="0.01" required placeholder="e.g. 2"></div>
+        <div class="field"><label>Sowing date</label><input class="crop-date" type="date"></div>
+        <div class="field"><label>Growth stage</label><select class="crop-stage"><option value="">Select stage</option><option>Germination</option><option>Seedling</option><option>Vegetative</option><option>Budding</option><option>Flowering</option><option>Fruiting</option><option>Maturity</option><option>Harvesting</option></select></div>
+        <div class="field"><label>Soil type</label><select class="crop-soil"><option value="">Select soil</option><option>Alluvial</option><option>Black</option><option>Red</option><option>Clay</option><option>Sandy</option><option>Loamy</option><option>Other</option></select></div>
+        <div class="field"><label>Irrigation type</label><select class="crop-irrigation"><option value="">Select irrigation</option><option>Canal</option><option>Borewell</option><option>Drip</option><option>Sprinkler</option><option>Rainfed</option><option>Other</option></select></div>
+      </div>
+    </div>
+  </template>
+  <script>
+    const list = document.getElementById('crop-list');
+    const template = document.getElementById('crop-template');
+    const message = document.getElementById('message');
+    const totalInput = document.getElementById('total_acres');
+    const cropTotal = document.getElementById('crop-total');
+    const saveButton = document.getElementById('save-btn');
+
+    function updateCropSummary() {
+      let total = 0;
+      list.querySelectorAll('.crop-acres').forEach(input => total += Number(input.value) || 0);
+      cropTotal.textContent = total.toFixed(2) + ' acres';
+      list.querySelectorAll('.crop').forEach((card, index) => {
+        card.querySelector('.crop-number').textContent = 'Crop ' + (index + 1);
+      });
+      return total;
+    }
+    function addCrop() {
+      const fragment = template.content.cloneNode(true);
+      const card = fragment.querySelector('.crop');
+      card.querySelector('.remove-crop').addEventListener('click', () => {
+        if (list.children.length === 1) {
+          card.querySelectorAll('input, select').forEach(el => el.value = '');
+        } else card.remove();
+        updateCropSummary();
+      });
+      card.querySelector('.crop-acres').addEventListener('input', updateCropSummary);
+      list.appendChild(fragment);
+      updateCropSummary();
+    }
+    document.getElementById('add-crop').addEventListener('click', addCrop);
+    totalInput.addEventListener('input', updateCropSummary);
+    addCrop();
+
+    document.getElementById('farmer-form').addEventListener('reset', () => {
+      setTimeout(() => { list.innerHTML = ''; addCrop(); updateCropSummary(); message.className = ''; message.textContent = ''; }, 0);
+    });
+
+    document.getElementById('farmer-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      message.className = ''; message.textContent = '';
+      const totalAcres = Number(totalInput.value);
+      const cropAcresTotal = updateCropSummary();
+      if (cropAcresTotal > totalAcres + 0.0001) {
+        message.className = 'error';
+        message.textContent = 'Crop acreage total cannot exceed total farmland.';
+        return;
+      }
+      const crops = [...list.querySelectorAll('.crop')].map(card => ({
+        crop_name: card.querySelector('.crop-name').value.trim(),
+        acres: Number(card.querySelector('.crop-acres').value),
+        sowing_date: card.querySelector('.crop-date').value || null,
+        growth_stage: card.querySelector('.crop-stage').value || null,
+        soil_type: card.querySelector('.crop-soil').value || null,
+        irrigation_type: card.querySelector('.crop-irrigation').value || null
+      }));
+      if (!crops.length || crops.some(c => !c.crop_name || !(c.acres > 0))) {
+        message.className = 'error'; message.textContent = 'Enter a crop name and valid acreage for every crop.'; return;
+      }
+      const payload = {
+        farmer_name: document.getElementById('farmer_name').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        village: document.getElementById('village').value.trim(),
+        district: document.getElementById('district').value.trim(),
+        state: document.getElementById('state').value.trim(),
+        total_acres: totalAcres,
+        crops
+      };
+      saveButton.disabled = true; saveButton.textContent = 'Saving...';
+      try {
+        const response = await fetch('/api/farmer-profile', {
+          method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Could not save farmer profile.');
+        message.className = 'success';
+        message.textContent = `Profile saved successfully. Farmer ID: ${result.farmer_id}.`;
+        document.getElementById('farmer-form').reset();
+      } catch (error) {
+        message.className = 'error'; message.textContent = error.message;
+      } finally {
+        saveButton.disabled = false; saveButton.textContent = 'Save Farmer Profile';
+      }
+    });
+  </script>
+</body>
+</html>

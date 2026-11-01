@@ -1,0 +1,1141 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#123e2b">
+    <title>SmartAgri | Crop Analysis</title>
+
+    <style>
+        :root {
+            --green: #216642;
+            --dark: #123e2b;
+            --light: #e9f5ec;
+            --page: #f5f8f5;
+            --text: #20362a;
+            --muted: #718078;
+            --border: #e3ebe4;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            background: var(--page);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont,
+                         "Segoe UI", sans-serif;
+        }
+
+        a { color: inherit; }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 18px 6%;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            text-decoration: none;
+        }
+
+        .brand-icon { font-size: 31px; }
+
+        .brand-title {
+            display: block;
+            font-size: 21px;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .brand-subtitle {
+            display: block;
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        nav a {
+            padding: 10px 12px;
+            text-decoration: none;
+            border-radius: 8px;
+            color: #53675a;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        nav a:hover, nav a.active {
+            background: var(--light);
+            color: var(--green);
+        }
+
+        .page-container {
+            max-width: 1180px;
+            margin: auto;
+            padding: 35px 25px 55px;
+        }
+
+        .welcome-banner {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 25px;
+            padding: 34px;
+            color: white;
+            background: linear-gradient(120deg, #123e2b, #28734b);
+            border-radius: 20px;
+            margin-bottom: 27px;
+        }
+
+        .eyebrow {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            color: #b8dfc5;
+        }
+
+        .welcome-banner h1 {
+            font-size: clamp(28px, 4vw, 43px);
+            line-height: 1.15;
+            letter-spacing: -1px;
+            margin: 12px 0;
+        }
+
+        .welcome-banner p {
+            max-width: 560px;
+            color: #e0eee4;
+            line-height: 1.7;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+        .banner-icon {
+            font-size: clamp(55px, 8vw, 100px);
+            padding: 12px;
+        }
+
+        .section-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 5px 18px rgba(25, 60, 38, 0.035);
+        }
+
+        .section-heading {
+            margin-bottom: 24px;
+        }
+
+        .section-heading .eyebrow {
+            color: var(--green);
+        }
+
+        .section-heading h2 {
+            font-size: 24px;
+            letter-spacing: -0.5px;
+            margin: 9px 0;
+        }
+
+        .section-heading p {
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .step-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 25px 0 17px;
+        }
+
+        .step-number {
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+            background: var(--light);
+            color: var(--green);
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .step-heading h3 {
+            font-size: 15px;
+            margin: 0 0 4px;
+        }
+
+        .step-heading p {
+            color: var(--muted);
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 9px;
+        }
+
+        .field select,
+        .field input[type="file"] {
+            width: 100%;
+            min-height: 47px;
+            padding: 12px 13px;
+            border: 1px solid #dce6dd;
+            border-radius: 9px;
+            background: #fff;
+            color: var(--text);
+            font: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .field select:focus,
+        .field input[type="file"]:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(33, 102, 66, 0.1);
+        }
+
+        .image-preview {
+            display: none;
+            margin-top: 14px;
+            max-width: 100%;
+            max-height: 280px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            object-fit: contain;
+            background: #f5f8f5;
+        }
+
+        .field-full { grid-column: 1 / -1; }
+
+        .form-note {
+            margin-top: 23px;
+            padding: 14px 16px;
+            background: #f5f8f5;
+            border-radius: 10px;
+            color: #607367;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .primary-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            border: none;
+            border-radius: 9px;
+            padding: 14px 20px;
+            background: var(--green);
+            color: white;
+            text-decoration: none;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .primary-button:hover {
+            background: var(--dark);
+            transform: translateY(-1px);
+        }
+
+        .submit-button {
+            width: 100%;
+            margin-top: 23px;
+        }
+
+        .result-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 5px 18px rgba(25, 60, 38, 0.035);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .result-card .eyebrow { color: var(--green); }
+
+        .result-card h2 {
+            font-size: 25px;
+            margin: 10px 0;
+        }
+
+        .result-meta {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .result-icon {
+            display: grid;
+            place-items: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 13px;
+            background: var(--light);
+            font-size: 24px;
+        }
+
+        .result-block {
+            margin-top: 22px;
+            padding: 19px;
+            border-radius: 12px;
+            background: #f5f8f5;
+        }
+
+        .result-block h3 {
+            font-size: 14px;
+            margin: 0 0 9px;
+        }
+
+        .result-block p {
+            color: #53675a;
+            font-size: 13px;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .reason-block {
+            background: #eef5f0;
+            border-left: 4px solid var(--green);
+        }
+
+        .save-status {
+            margin-top: 18px;
+            padding: 13px 15px;
+            border-radius: 9px;
+            background: #e9f5ec;
+            color: #216642;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .error-card {
+            border-left: 4px solid #c84d42;
+            background: #fff8f7;
+        }
+
+        .error-card h3 { color: #a5362d; }
+
+        .error-card p {
+            color: #7d403b;
+            line-height: 1.7;
+            font-size: 13px;
+        }
+
+        .disclaimer {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.8;
+            margin-top: 20px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 17px;
+            margin-bottom: 25px;
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 21px;
+        }
+
+        .feature-icon {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            background: var(--light);
+            font-size: 21px;
+        }
+
+        .feature-card h3 {
+            font-size: 14px;
+            margin: 15px 0 8px;
+        }
+
+        .feature-card p {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .about-card {
+            background: #edf5ee;
+            border-radius: 16px;
+            padding: 27px;
+        }
+
+        .about-card h2 {
+            margin: 9px 0;
+            font-size: 22px;
+        }
+
+        .about-card p {
+            color: #52685a;
+            max-width: 780px;
+            font-size: 13px;
+            line-height: 1.9;
+        }
+
+        .about-card .eyebrow { color: var(--green); }
+
+        footer {
+            padding: 24px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 700px) {
+            .navbar { padding: 16px 5%; }
+            nav { gap: 2px; }
+            nav a { padding: 9px; font-size: 11px; }
+            .page-container { padding: 22px 14px 35px; }
+            .welcome-banner { padding: 24px; }
+            .banner-icon { display: none; }
+            .section-card, .result-card { padding: 20px; }
+            .form-grid { grid-template-columns: 1fr; gap: 17px; }
+            .field-full { grid-column: auto; }
+            .feature-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="navbar">
+    <a href="{{ url_for('home') }}" class="brand">
+        <span class="brand-icon">🌱</span>
+        <span>
+            <span class="brand-title">SmartAgri</span>
+            <span class="brand-subtitle">Ashuu Farm</span>
+        </span>
+    </a>
+
+    <nav aria-label="Main navigation">
+        <a href="{{ url_for('home') }}" class="active">Crop Analysis</a>
+        <a href="#about">About</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('history') }}">Analysis History</a>
+    </nav>
+</header>
+
+<main class="page-container">
+
+    <section class="welcome-banner">
+        <div>
+            <span class="eyebrow">INTELLIGENT FARMING ASSISTANT</span>
+            <h1>Grow smarter.<br>Farm better.</h1>
+            <p>
+                Explore crop conditions with a simple decision-support tool.
+                Enter your observations to receive a preliminary,
+                explainable recommendation.
+            </p>
+        </div>
+        <div class="banner-icon" aria-hidden="true">🌿</div>
+    </section>
+
+    <section class="feature-grid" aria-label="SmartAgri features">
+        <article class="feature-card">
+            <span class="feature-icon">🌱</span>
+            <h3>Crop Insights</h3>
+            <p>Record the crop type and its current growth stage.</p>
+        </article>
+
+        <article class="feature-card">
+            <span class="feature-icon">🌦️</span>
+            <h3>Field Conditions</h3>
+            <p>Include soil moisture, weather and visible symptoms.</p>
+        </article>
+
+        <article class="feature-card">
+            <span class="feature-icon">🧠</span>
+            <h3>Explainable Advice</h3>
+            <p>Review the suggested next step and why it was suggested.</p>
+        </article>
+    </section>
+
+    <section id="analyze" class="section-card">
+        <div class="section-heading">
+            <span class="eyebrow">CROP HEALTH ASSISTANT</span>
+            <h2>Analyze your crop</h2>
+            <p>
+                Complete the fields below using your observations.
+                All fields are required.
+            </p>
+        </div>
+
+        <form method="POST" action="{{ url_for('home') }}"
+              class="analysis-form" enctype="multipart/form-data">
+
+            <div class="step-heading">
+                <span class="step-number">01</span>
+                <div>
+                    <h3>Crop information</h3>
+                    <p>Choose the crop and its growth stage.</p>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                
+<div class="field">
+    <label for="crop">Crop category and type</label>
+    <select id="crop_category" name="crop_category" required>
+        <option value="">Choose a crop category</option>
+        <option value="cereals_millets">Cereals and Millets</option>
+        <option value="pulses_legumes">Pulses and Legumes</option>
+        <option value="oilseeds">Oilseed Crops</option>
+        <option value="fibre">Fibre Crops</option>
+        <option value="commercial">Sugar and Commercial Crops</option>
+        <option value="leafy_vegetables">Leafy Vegetables</option>
+        <option value="fruit_vegetables">Fruit Vegetables</option>
+        <option value="root_tuber">Root and Tuber Vegetables</option>
+        <option value="other_vegetables">Other Vegetables</option>
+        <option value="fruits">Fruits</option>
+        <option value="spices">Spices and Condiments</option>
+        <option value="plantation">Plantation and Beverage Crops</option>
+        <option value="medicinal">Medicinal and Aromatic Crops</option>
+        <option value="flowers">Flowers and Ornamental Crops</option>
+        <option value="fodder">Fodder and Green-Manure Crops</option>
+        <option value="regional">Regional and Underutilized Crops</option>
+    </select>
+</div>
+
+<div class="field">
+    <label for="crop">Crop type</label>
+    <select id="crop" name="crop" required>
+        <option value="">First choose a category</option>
+    </select>
+</div>
+
+<script>
+const cropGroups = {
+    cereals_millets: [
+        ["rice", "Rice (Paddy)"],
+        ["wheat", "Wheat"],
+        ["maize", "Maize"],
+        ["jowar", "Jowar (Sorghum)"],
+        ["bajra", "Bajra (Pearl Millet)"],
+        ["ragi", "Ragi (Finger Millet)"],
+        ["barley", "Barley"],
+        ["foxtail_millet", "Foxtail Millet"],
+        ["little_millet", "Little Millet"],
+        ["kodo_millet", "Kodo Millet"],
+        ["barnyard_millet", "Barnyard Millet"],
+        ["proso_millet", "Proso Millet"],
+        ["browntop_millet", "Browntop Millet"],
+        ["oats", "Oats"],
+        ["buckwheat", "Buckwheat"],
+        ["amaranth_grain", "Amaranth Grain"],
+        ["black_rice", "Black Rice"],
+        ["basmati_rice", "Basmati Rice"],
+        ["jobs_tears", "Job's Tears"]
+    ],
+    pulses_legumes: [
+        ["chickpea", "Chickpea (Bengal Gram)"],
+        ["pigeon_pea", "Pigeon Pea (Toor Dal)"],
+        ["green_gram", "Green Gram (Moong)"],
+        ["black_gram", "Black Gram (Urad)"],
+        ["lentil", "Lentil (Masoor)"],
+        ["field_pea", "Field Pea"],
+        ["cowpea", "Cowpea"],
+        ["horse_gram", "Horse Gram"],
+        ["moth_bean", "Moth Bean"],
+        ["kidney_bean", "Kidney Bean (Rajma)"],
+        ["french_bean", "French Bean"],
+        ["soybean", "Soybean"],
+        ["white_pea", "White Pea"],
+        ["faba_bean", "Faba Bean"],
+        ["hyacinth_bean", "Hyacinth Bean"],
+        ["winged_bean", "Winged Bean"],
+        ["rice_bean", "Rice Bean"],
+        ["bambara_groundnut", "Bambara Groundnut"]
+    ],
+    oilseeds: [
+        ["groundnut", "Groundnut (Peanut)"],
+        ["mustard", "Mustard"],
+        ["rapeseed", "Rapeseed"],
+        ["soybean", "Soybean"],
+        ["sunflower", "Sunflower"],
+        ["sesame", "Sesame (Gingelly)"],
+        ["safflower", "Safflower"],
+        ["niger_seed", "Niger Seed"],
+        ["linseed", "Linseed (Flaxseed)"],
+        ["castor", "Castor"],
+        ["coconut", "Coconut"],
+        ["oil_palm", "Oil Palm"],
+        ["cottonseed", "Cottonseed"],
+        ["pongamia", "Pongamia (Karanja)"],
+        ["neem_seed", "Neem Seed"],
+        ["perilla", "Perilla"],
+        ["watermelon_seed", "Watermelon Seed"],
+        ["pumpkin_seed", "Pumpkin Seed"]
+    ],
+    fibre: [
+        ["cotton", "Cotton"],
+        ["jute", "Jute"],
+        ["mesta", "Mesta"],
+        ["sunn_hemp", "Sunn Hemp"],
+        ["flax", "Flax"],
+        ["kenaf", "Kenaf"],
+        ["ramie", "Ramie"],
+        ["sisal", "Sisal"],
+        ["banana_fibre", "Banana Fibre"]
+    ],
+    commercial: [
+        ["sugarcane", "Sugarcane"],
+        ["sugar_beet", "Sugar Beet"],
+        ["tobacco", "Tobacco"],
+        ["tea", "Tea"],
+        ["coffee", "Coffee"],
+        ["rubber", "Rubber"],
+        ["arecanut", "Arecanut"],
+        ["betel_leaf", "Betel Leaf"],
+        ["cocoa", "Cocoa"],
+        ["guar", "Guar"]
+    ],
+    leafy_vegetables: [
+        ["spinach", "Spinach"],
+        ["amaranth_leaves", "Amaranth Leaves"],
+        ["fenugreek_leaves", "Fenugreek Leaves"],
+        ["coriander_leaves", "Coriander Leaves"],
+        ["mint", "Mint"],
+        ["mustard_greens", "Mustard Greens"],
+        ["lettuce", "Lettuce"],
+        ["bathua", "Bathua"],
+        ["gongura", "Gongura"],
+        ["malabar_spinach", "Malabar Spinach"],
+        ["drumstick_leaves", "Drumstick Leaves"],
+        ["dill_leaves", "Dill Leaves"]
+    ],
+    fruit_vegetables: [
+        ["tomato", "Tomato"],
+        ["brinjal", "Brinjal (Eggplant)"],
+        ["chilli", "Green Chilli"],
+        ["capsicum", "Capsicum"],
+        ["okra", "Okra (Lady's Finger)"],
+        ["cucumber", "Cucumber"],
+        ["bottle_gourd", "Bottle Gourd"],
+        ["bitter_gourd", "Bitter Gourd"],
+        ["ridge_gourd", "Ridge Gourd"],
+        ["sponge_gourd", "Sponge Gourd"],
+        ["snake_gourd", "Snake Gourd"],
+        ["pumpkin", "Pumpkin"],
+        ["ash_gourd", "Ash Gourd"],
+        ["pointed_gourd", "Pointed Gourd"],
+        ["ivy_gourd", "Ivy Gourd"],
+        ["chayote", "Chayote"],
+        ["zucchini", "Zucchini"],
+        ["sweet_corn", "Sweet Corn"],
+        ["baby_corn", "Baby Corn"]
+    ],
+    root_tuber: [
+        ["potato", "Potato"],
+        ["sweet_potato", "Sweet Potato"],
+        ["tapioca", "Tapioca (Cassava)"],
+        ["elephant_foot_yam", "Elephant Foot Yam"],
+        ["colocasia", "Colocasia (Taro)"],
+        ["greater_yam", "Greater Yam"],
+        ["lesser_yam", "Lesser Yam"],
+        ["carrot", "Carrot"],
+        ["radish", "Radish"],
+        ["beetroot", "Beetroot"],
+        ["turnip", "Turnip"],
+        ["onion", "Onion"],
+        ["garlic", "Garlic"],
+        ["shallots", "Shallots"],
+        ["lotus_root", "Lotus Root"],
+        ["arrowroot", "Arrowroot"]
+    ],
+    other_vegetables: [
+        ["cabbage", "Cabbage"],
+        ["cauliflower", "Cauliflower"],
+        ["broccoli", "Broccoli"],
+        ["knol_khol", "Knol-khol"],
+        ["brussels_sprouts", "Brussels Sprouts"],
+        ["green_peas", "Green Peas"],
+        ["french_beans", "French Beans"],
+        ["cluster_beans", "Cluster Beans"],
+        ["drumstick_pods", "Drumstick Pods"],
+        ["raw_banana", "Raw Banana"],
+        ["raw_papaya", "Raw Papaya"],
+        ["tender_jackfruit", "Tender Jackfruit"],
+        ["mushroom", "Cultivated Mushroom"]
+    ],
+    fruits: [
+        ["mango", "Mango"],
+        ["banana", "Banana"],
+        ["papaya", "Papaya"],
+        ["guava", "Guava"],
+        ["pineapple", "Pineapple"],
+        ["jackfruit", "Jackfruit"],
+        ["sapota", "Sapota (Chikoo)"],
+        ["watermelon", "Watermelon"],
+        ["muskmelon", "Muskmelon"],
+        ["pomegranate", "Pomegranate"],
+        ["sweet_lime", "Sweet Lime"],
+        ["sweet_orange", "Sweet Orange"],
+        ["lemon", "Lemon"],
+        ["acid_lime", "Acid Lime"],
+        ["grapefruit", "Grapefruit"],
+        ["pomelo", "Pomelo"],
+        ["custard_apple", "Custard Apple"],
+        ["amla", "Amla (Indian Gooseberry)"],
+        ["jamun", "Jamun"],
+        ["ber", "Ber (Indian Jujube)"],
+        ["bael", "Bael"],
+        ["wood_apple", "Wood Apple"],
+        ["tamarind", "Tamarind"],
+        ["avocado", "Avocado"],
+        ["passion_fruit", "Passion Fruit"],
+        ["dragon_fruit", "Dragon Fruit"],
+        ["litchi", "Litchi"],
+        ["mulberry", "Mulberry"],
+        ["fig", "Fig"],
+        ["apple", "Apple"],
+        ["pear", "Pear"],
+        ["peach", "Peach"],
+        ["plum", "Plum"],
+        ["apricot", "Apricot"],
+        ["cherry", "Cherry"],
+        ["strawberry", "Strawberry"],
+        ["kiwi", "Kiwi"],
+        ["grapes", "Grapes"],
+        ["almond", "Almond"],
+        ["walnut", "Walnut"],
+        ["cashew", "Cashew"]
+    ],
+    spices: [
+        ["black_pepper", "Black Pepper"],
+        ["small_cardamom", "Small Cardamom"],
+        ["large_cardamom", "Large Cardamom"],
+        ["ginger", "Ginger"],
+        ["turmeric", "Turmeric"],
+        ["dry_chilli", "Dry Chilli"],
+        ["coriander_seed", "Coriander Seed"],
+        ["cumin", "Cumin"],
+        ["fennel", "Fennel"],
+        ["fenugreek", "Fenugreek"],
+        ["mustard_seed", "Mustard Seed"],
+        ["ajwain", "Ajwain"],
+        ["dill_seed", "Dill Seed"],
+        ["nigella", "Nigella (Kalonji)"],
+        ["clove", "Clove"],
+        ["cinnamon", "Cinnamon"],
+        ["nutmeg", "Nutmeg"],
+        ["mace", "Mace"],
+        ["vanilla", "Vanilla"],
+        ["saffron", "Saffron"],
+        ["curry_leaf", "Curry Leaf"],
+        ["kokum", "Kokum"],
+        ["asafoetida", "Asafoetida (Hing)"]
+    ],
+    plantation: [
+        ["tea", "Tea"],
+        ["coffee", "Coffee"],
+        ["coconut", "Coconut"],
+        ["arecanut", "Arecanut"],
+        ["rubber", "Rubber"],
+        ["cocoa", "Cocoa"],
+        ["oil_palm", "Oil Palm"],
+        ["cashew", "Cashew"],
+        ["betel_vine", "Betel Vine"],
+        ["vanilla", "Vanilla"],
+        ["black_pepper", "Black Pepper"],
+        ["cardamom", "Cardamom"],
+        ["clove", "Clove"],
+        ["nutmeg", "Nutmeg"],
+        ["cinnamon", "Cinnamon"],
+        ["bamboo", "Commercial Bamboo"],
+        ["agarwood", "Agarwood"]
+    ],
+    medicinal: [
+        ["ashwagandha", "Ashwagandha"],
+        ["tulsi", "Tulsi"],
+        ["aloe_vera", "Aloe Vera"],
+        ["neem", "Neem"],
+        ["senna", "Senna"],
+        ["isabgol", "Isabgol (Psyllium)"],
+        ["sarpagandha", "Sarpagandha"],
+        ["safed_musli", "Safed Musli"],
+        ["shatavari", "Shatavari"],
+        ["kalmegh", "Kalmegh"],
+        ["brahmi", "Brahmi"],
+        ["stevia", "Stevia"],
+        ["lemongrass", "Lemongrass"],
+        ["citronella", "Citronella"],
+        ["vetiver", "Vetiver"],
+        ["palmarosa", "Palmarosa"],
+        ["patchouli", "Patchouli"],
+        ["sandalwood", "Sandalwood"],
+        ["moringa", "Moringa"],
+        ["chamomile", "Chamomile"]
+    ],
+    flowers: [
+        ["rose", "Rose"],
+        ["jasmine", "Jasmine"],
+        ["marigold", "Marigold"],
+        ["chrysanthemum", "Chrysanthemum"],
+        ["tuberose", "Tuberose"],
+        ["gerbera", "Gerbera"],
+        ["gladiolus", "Gladiolus"],
+        ["carnation", "Carnation"],
+        ["orchid", "Orchid"],
+        ["anthurium", "Anthurium"],
+        ["lotus", "Lotus"],
+        ["water_lily", "Water Lily"],
+        ["crossandra", "Crossandra"],
+        ["china_aster", "China Aster"],
+        ["hibiscus", "Hibiscus"],
+        ["dahlia", "Dahlia"],
+        ["petunia", "Petunia"],
+        ["lilium", "Lilium"],
+        ["bird_of_paradise", "Bird of Paradise"]
+    ],
+    fodder: [
+        ["berseem", "Berseem"],
+        ["lucerne", "Lucerne (Alfalfa)"],
+        ["fodder_sorghum", "Fodder Sorghum"],
+        ["fodder_maize", "Fodder Maize"],
+        ["fodder_pearl_millet", "Fodder Pearl Millet"],
+        ["napier_grass", "Napier Grass"],
+        ["guinea_grass", "Guinea Grass"],
+        ["para_grass", "Para Grass"],
+        ["stylo", "Stylo"],
+        ["fodder_cowpea", "Cowpea (Fodder)"],
+        ["fodder_oats", "Oats (Fodder)"],
+        ["dhaincha", "Dhaincha"],
+        ["sesbania", "Sesbania"],
+        ["pillipesara", "Pillipesara"],
+        ["velvet_bean", "Velvet Bean"],
+        ["fodder_beet", "Fodder Beet"]
+    ],
+    regional: [
+        ["kalingda", "Kalingda"],
+        ["traditional_black_rice", "Traditional Black Rice"],
+        ["traditional_red_rice", "Traditional Red Rice"],
+        ["adzuki_bean", "Adzuki Bean"],
+        ["finger_millet_landrace", "Finger Millet Landrace"],
+        ["taro_landrace", "Taro Landrace"],
+        ["indigenous_cowpea", "Indigenous Cowpea Variety"],
+        ["indigenous_pigeon_pea", "Indigenous Pigeon Pea Variety"],
+        ["indigenous_chilli", "Indigenous Chilli Variety"],
+        ["indigenous_mango", "Indigenous Mango Variety"],
+        ["indigenous_banana", "Indigenous Banana Variety"],
+        ["indigenous_citrus", "Indigenous Citrus Variety"],
+        ["indigenous_jackfruit", "Indigenous Jackfruit Variety"]
+    ]
+};
+
+const categorySelect = document.getElementById("crop_category");
+const cropSelect = document.getElementById("crop");
+
+categorySelect.addEventListener("change", function () {
+    const crops = cropGroups[this.value] || [];
+
+    cropSelect.innerHTML = '<option value="">Choose a crop</option>';
+
+    crops.forEach(function (crop) {
+        const option = document.createElement("option");
+        option.value = crop[0];
+        option.textContent = crop[1];
+        cropSelect.appendChild(option);
+    });
+});
+</script>
+
+
+                <div class="field">
+    <label for="growth_stage">Growth stage</label>
+    <select id="growth_stage" name="growth_stage" required>
+        <option value="">Choose a stage</option>
+        <option value="germination">Germination</option>
+        <option value="seedling">Seedling</option>
+        <option value="early_vegetative">Early Vegetative</option>
+        <option value="vegetative">Vegetative</option>
+        <option value="late_vegetative">Late Vegetative</option>
+        <option value="budding">Budding</option>
+        <option value="flowering">Flowering</option>
+        <option value="fruiting">Fruiting</option>
+        <option value="maturity">Maturity</option>
+        <option value="harvesting">Harvesting</option>
+    </select>
+</div>
+            </div>
+
+            <div class="step-heading">
+                <span class="step-number">02</span>
+                <div>
+                    <h3>Growing conditions</h3>
+                    <p>Describe the soil moisture and current weather.</p>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="field">
+    <label for="soil_moisture">Soil moisture</label>
+    <select id="soil_moisture" name="soil_moisture" required>
+        <option value="">Select moisture level</option>
+        <option value="very_low">Very Low</option>
+        <option value="low">Low</option>
+        <option value="normal">Normal</option>
+        <option value="high">High</option>
+        <option value="very_high">Very High</option>
+    </select>
+</div>
+
+                <div class="field">
+    <label for="weather">Weather conditions</label>
+    <select id="weather" name="weather" required>
+        <option value="">Select conditions</option>
+        <option value="hot_dry">Hot and Dry</option>
+        <option value="sunny">Sunny</option>
+        <option value="cloudy">Cloudy</option>
+        <option value="mild">Mild</option>
+        <option value="rainy">Rainy</option>
+        <option value="heavy_rain">Heavy Rain</option>
+        <option value="humid">Humid</option>
+        <option value="windy">Windy</option>
+        <option value="cold">Cold</option>
+        <option value="frost">Frost</option>
+    </select>
+</div>
+            </div>
+
+            <div class="step-heading">
+                <span class="step-number">03</span>
+                <div>
+                    <h3>Visible symptoms</h3>
+                    <p>Select the closest match to what you observe.</p>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="field field-full">
+    <label for="symptoms">Observed crop symptoms</label>
+    <select id="symptoms" name="symptoms" required>
+        <option value="">Choose an option</option>
+        <option value="none">No Visible Symptoms</option>
+        <option value="yellowing">Yellowing Leaves</option>
+        <option value="spots">Spots on Leaves</option>
+        <option value="brown_spots">Brown Spots</option>
+        <option value="black_spots">Black Spots</option>
+        <option value="leaf_curling">Leaf Curling</option>
+        <option value="holes_in_leaves">Holes in Leaves</option>
+        <option value="leaf_edges_browning">Leaf Edges Browning</option>
+        <option value="wilting">Wilting</option>
+        <option value="stunted_growth">Stunted Growth</option>
+        <option value="root_rot">Root Rot</option>
+        <option value="stem_lesions">Stem Lesions</option>
+        <option value="powdery_growth">Powdery Growth</option>
+        <option value="rust_colored_pustules">Rust-Colored Pustules</option>
+        <option value="mosaic_pattern">Mosaic Pattern</option>
+        <option value="fruit_rot">Fruit Rot</option>
+        <option value="flower_drop">Flower Drop</option>
+        <option value="premature_leaf_fall">Premature Leaf Fall</option>
+        <option value="discoloration">Discoloration</option>
+        <option value="insect_damage">Insect Damage</option>
+        <option value="sticky_leaves">Sticky Leaves</option>
+        <option value="white_patches">White Patches</option>
+        <option value="dry_leaves">Dry Leaves</option>
+    </select>
+</div>
+            </div>
+
+            <div class="step-heading">
+                <span class="step-number">04</span>
+                <div>
+                    <h3>Upload crop image</h3>
+                    <p>Add a clear photo of the affected leaf, fruit, or plant.</p>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="field field-full">
+                    <label for="crop_image">Crop photo (optional)</label>
+                    <input
+                        type="file"
+                        id="crop_image"
+                        name="crop_image"
+                        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                        aria-describedby="crop-image-help"
+                    >
+                    <p class="disclaimer" id="crop-image-help">
+                        JPG, PNG, or WebP · Maximum 5 MB. Uploading a photo
+                        does not by itself identify a disease; an AI model
+                        must be connected for image-based predictions.
+                    </p>
+                    <img id="image-preview" class="image-preview"
+                         alt="Preview of the selected crop photo">
+                </div>
+            </div>
+
+            <div class="form-note">
+                <strong>Before you continue:</strong> Choose the options that
+                best match your field observations. The result is preliminary
+                decision support, not a confirmed disease diagnosis.
+            </div>
+
+            <button type="submit" class="primary-button submit-button">
+                Analyze Crop Conditions <span aria-hidden="true">→</span>
+            </button>
+        </form>
+    </section>
+
+    <script>
+        const cropImageInput = document.getElementById("crop_image");
+        const imagePreview = document.getElementById("image-preview");
+
+        cropImageInput.addEventListener("change", function () {
+            const file = this.files && this.files[0];
+
+            if (!file) {
+                imagePreview.removeAttribute("src");
+                imagePreview.style.display = "none";
+                return;
+            }
+
+            const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+            const maxBytes = 5 * 1024 * 1024;
+
+            if (!allowedTypes.includes(file.type) || file.size > maxBytes) {
+                alert("Please choose a JPG, PNG, or WebP image smaller than 5 MB.");
+                this.value = "";
+                imagePreview.removeAttribute("src");
+                imagePreview.style.display = "none";
+                return;
+            }
+
+            imagePreview.src = URL.createObjectURL(file);
+            imagePreview.style.display = "block";
+        });
+    </script>
+
+    {% if error %}
+    <section class="result-card error-card" role="alert">
+        <h3>⚠️ Please check your inputs</h3>
+        <p>{{ error }}</p>
+    </section>
+    {% endif %}
+
+    {% if result %}
+    <section class="result-card" aria-live="polite">
+        <div class="result-header">
+            <div>
+                <span class="eyebrow">YOUR ANALYSIS RESULT</span>
+                <h2>{{ result.risk }}</h2>
+                <p class="result-meta">
+                    Crop: {{ result.crop|replace('_', ' ')|title }}
+                    · Growth stage:
+                    {{ result.growth_stage|replace('_', ' ')|title }}
+                </p>
+            </div>
+            <div class="result-icon" aria-hidden="true">🌿</div>
+        </div>
+
+        <div class="result-block">
+            <h3>✓ Recommended next step</h3>
+            <p>{{ result.recommendation }}</p>
+        </div>
+
+        <div class="result-block reason-block">
+            <h3>🧠 Why this result?</h3>
+            <p>{{ result.reason }}</p>
+        </div>
+
+        {% if db_saved %}
+        <div class="save-status" role="status">
+            ✓ Analysis saved successfully to your database.
+        </div>
+        {% elif db_message %}
+        <div class="save-status" role="status">
+            {{ db_message }}
+        </div>
+        {% endif %}
+
+        <p class="disclaimer">
+            This result is preliminary decision support based on the
+            information entered. Check actual field conditions and consult
+            a qualified local agricultural expert for important
+            crop-management decisions.
+        </p>
+
+        <a href="{{ url_for('history') }}" class="primary-button">
+            View Analysis History →
+        </a>
+    </section>
+    {% endif %}
+
+    <section id="about" class="about-card">
+        <span class="eyebrow">ABOUT THE PROJECT</span>
+        <h2>Technology with a purpose</h2>
+        <p>
+            SmartAgri demonstrates how agricultural information and
+            rule-based reasoning can help organize crop observations,
+            explain possible concerns and suggest next steps.
+            Its recommendations should be verified against real field
+            conditions and reliable agricultural guidance.
+        </p>
+    </section>
+
+</main>
+
+<footer>
+    <strong>🌱 SmartAgri · Ashuu Farm</strong><br>
+    Smart decisions for sustainable farming
+</footer>
+
+</body>
+</html>
